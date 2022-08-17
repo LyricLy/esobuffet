@@ -7,7 +7,7 @@ function doUnit(s, ms, amount, unit) {
 }
 
 for (const elem of document.getElementsByClassName("datetime")) {
-    let date = new Date(elem.innerHTML);
+    let date = new Date(elem.innerText.trim());
     if (date < new Date()) {
         elem.innerHTML = date.toLocaleString();
         continue;

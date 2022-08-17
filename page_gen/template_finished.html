@@ -1,0 +1,16 @@
+{% extends 'template_first.html' %}
+
+{% block deadlines %}
+  Stage 2 since
+  <strong><span class="datetime">
+    {{ round.first_deadline.isoformat() }}
+  </span></strong>.
+  Stage 2 deadline:
+  <strong><span class="datetime">
+    {{ round.second_deadline.isoformat() }}
+  </span></strong>.
+{% endblock %}
+
+
+{# TODO #}
+  <pre class="line-numbers"><div>{% for _ in range(file_length) %}<span></span>{% endfor %}</div><code class="language-{{ file_language }}">{{ file_contents }}</code></pre>

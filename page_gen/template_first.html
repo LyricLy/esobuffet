@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Esolang Buffet</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <meta charset="utf-8">
+  <meta content="website" property="og:type">
+  <meta content="https://eb.esolangs.gay/favicon.png" property="og:image">
+  <meta content="Esolangs" property="og:site_name">
+  <link rel="stylesheet" href="../main.css">
+  <meta content="Esolang Buffet #{{ round.id }}" property="og:title">
+  <meta content="{{ config['page description'] }}" property="og:description">
+  <meta content="https://eb.esolangs.gay/{{ round.id }}/" property="og:url">
+  <script src="../main.js" defer></script>
+  <!-- highlight -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/default.min.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    pre, pre *
+    {
+      font:normal normal normal 1em/1.4 monaco, courier, monospace;
+    }
+    pre
+    {
+      font-size:0.8em;
+    }
+    pre.line-numbers
+    {
+      position:relative;
+    }
+    pre.line-numbers code, 
+    pre.line-numbers samp
+    {
+      margin-left:3em;
+    }
+    pre div
+    {
+      display:none;
+    }
+    pre.line-numbers > div
+    {
+      display:block;
+      
+      position:absolute;
+      top:0;
+      left:0;
+    }
+    pre.line-numbers > div > span
+    {
+      display:block;
+      width:2.5em;
+      padding:0 0.5em 0 0;
+      
+      text-align:right;
+    }
+    pre.line-numbers > div
+    {
+      counter-reset:line;
+      padding: 1em 0 0 0;
+    }
+    pre.line-numbers > div > span
+    {
+      counter-increment:line;
+    }
+    pre.line-numbers > div > span::before
+    {
+      content:counter(line);
+    }
+  </style>
+</head>
+<body>
+  <h1>Esolang Buffet, round #{{ round.id }}</h1>
+  <p>
+    Started at
+    <strong><span class="datetime">
+      {{ round.start.isoformat() }}+00:00
+    </span></strong>.
+    {% block dates %}
+      Stage 1 deadline:
+      <strong><span class="datetime">
+        {{ round.first_deadline.isoformat() }}+00:00
+      </span></strong>.
+    {% endblock %}
+  </p>
+  <h2>Specification</h2>
+  <p>
+    The task for the first round is <strong>{{ config['task name'] }}</strong>.
+  </p>
+  <p>
+    {{ config['task description'] }}
+  </p>
+  <p>
+    The test cases are as follows:
+  </p>
+  <pre><code>{{ config['test cases'] }}</code></pre>
+</body>
