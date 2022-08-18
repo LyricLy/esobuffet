@@ -102,3 +102,30 @@ def progress_round(round_num):
     session.close()
 
     render_second(round_num)
+
+
+def solve(round, player_name, solved_name):
+
+    session = Session()
+    player = session.query(Player).filter(Player.name==player_name)\
+             .filter(Player.round==round).one()
+    solved = session.query(Player).filter(Player.name==solved_name)\
+             .filter(Player.round==round).one()
+    assert solved.id != player.id
+    new_solution = Solution(round=round, player=player.id, solved=solved.id)
+    session.add(new_solution)
+    session.commit()
+    session.close()
+
+def close_round(round_num):
+
+    session = Session()
+    round = session.query(Round).get(round_num)
+
+    now = datetime.utcnow()
+
+    round.second_deadline = now
+    session.commit()
+    session.close()
+
+    render_finished(round_num)

@@ -1,16 +1,42 @@
-{% extends 'template_first.html' %}
+{% extends 'template_second.html' %}
 
 {% block deadlines %}
   Stage 2 since
   <strong><span class="datetime">
     {{ round.first_deadline.isoformat() }}
   </span></strong>.
-  Stage 2 deadline:
+  Ended at:
   <strong><span class="datetime">
     {{ round.second_deadline.isoformat() }}
   </span></strong>.
 {% endblock %}
 
 
-{# TODO #}
-  <pre class="line-numbers"><div>{% for _ in range(file_length) %}<span></span>{% endfor %}</div><code class="language-{{ file_language }}">{{ file_contents }}</code></pre>
+{% block results %}
+  <h1>Results</h1>
+  <p><table>
+    <tr>
+      <th>Place</th><th>Player</th><th>Points</ht>
+    </tr>
+    {% for player in players|sort(attribute='place') %}
+      <tr>
+        <td>{{ player['place'] }}</td>
+        <td>{{ player['name'] }}</td>
+        <td align="right">{{ player['score'] }}</td>
+      </tr>
+    {% endfor %}
+  </table></p>
+  
+  <p><b>Point multiplier:</b> {{ multiplier }}</p>
+  
+  <p><table>
+    <tr>
+      <th>Solver</th><th>&rarr;</th><th>Solved</th>
+    </tr>
+    {% for solver, solved in solve_data %}
+      <tr>
+        <td>{{ solver.name }}</td><td>&rarr;</td><td>{{ solved.name }}</td>
+      </tr>
+    {% endfor %}
+  </table></p>
+{% endblock %}

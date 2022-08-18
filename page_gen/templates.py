@@ -1,10 +1,13 @@
 from .model import Session, File, Round, Player, Solution
 
+from jinja2 import Environment, select_autoescape, FileSystemLoader
+from sqlalchemy.orm import aliased
+from sqlalchemy import and_, func
 from charset_normalizer import from_path
 from magic import from_file
 
-from jinja2 import Environment, select_autoescape, FileSystemLoader
 from datetime import datetime
+from math import lcm
 import configparser
 import re
 
@@ -21,24 +24,7 @@ finished_template = env.get_template('template_finished.html')
 config_template = env.get_template('template.ini')
 
 
-
-
-def render_first(round_num):
-
-    session = Session()
-    round = session.query(Round).get(round_num)
-    session.close()
-
-    config = configparser.ConfigParser()
-    config.read(f'{round_num}/config.ini')
-
-    with open(f'{round_num}/index.html', 'w') as f:
-        print(first_template.render(config=config['round'],
-                                    round=round),
-              file=f)
-
-
-def render_second(round_num):
+def render_stage(round_num, template):
 
     session = Session()
     round = session.query(Round).get(round_num)
@@ -70,7 +56,29 @@ def render_second(round_num):
             'name': p.name,
             'id': p.id,
             'files' : files,
+            'solved_by' : 0,
+            'score' : 0,
         })
+
+    solve_alias = aliased(Player, name='solve_alias')
+    solve_data = session.query(Player, solve_alias).select_from(Player)\
+                 .join(Solution, and_(Solution.player==Player.id,
+                                      Solution.round==Player.round))\
+                 .join(solve_alias, and_(solve_alias.id==Solution.solved,
+                                         solve_alias.round==Solution.round))\
+                 .filter(Solution.round==round_num)\
+                 .order_by(Player.id, solve_alias.id).all()
+
+    for _, p in solve_data:
+        players[p.id - 1]['solved_by'] += 1
+    multiplier = lcm(*(p['solved_by'] for p in players if p['solved_by'] > 0))
+    for who, whom in solve_data:
+        players[who.id-1]['score'] += multiplier//players[whom.id-1]['solved_by']
+    for player in players:
+        player['score'] += multiplier//player['solved_by']\
+                           if player['solved_by'] > 0 else 0
+    for player in players:
+        player['place'] = sum(p['score'] > player['score'] for p in players) + 1
 
     session.close()
 
@@ -78,11 +86,14 @@ def render_second(round_num):
     config.read(f'{round_num}/config.ini')
 
     with open(f'{round_num}/index.html', 'w') as f:
-        print(second_template.render(config=config['round'],
-                                     round=round,
-                                     players=players),
+        print(template.render(config=config['round'],
+                              round=round,
+                              players=players,
+                              solve_data=solve_data,
+                              multiplier=multiplier),
               file=f)
 
 
-def render_finished(round_num):
-    pass
+render_first = lambda x: render_stage(x, first_template)
+render_second = lambda x: render_stage(x, second_template)
+render_finished = lambda x: render_stage(x, finished_template)

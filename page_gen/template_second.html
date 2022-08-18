@@ -1,14 +1,24 @@
 {% extends 'template_first.html' %}
 
-{% block deadlines %}
+{% block dates %}
   Stage 2 since
   <strong><span class="datetime">
-    {{ round.first_deadline.isoformat() }}
+    {{- round.first_deadline.isoformat() -}}+00:00
   </span></strong>.
   Stage 2 deadline:
   <strong><span class="datetime">
-    {{ round.second_deadline.isoformat() }}
+    {{- round.second_deadline.isoformat() -}}+00:00
   </span></strong>.
+{% endblock %}
+
+
+{% block players %}
+  <h2>Players</h2>
+  <ul>
+    {% for player in players %}
+      <li>{{ player['name'] }}</li>
+    {% endfor %}
+  </ul>
 {% endblock %}
 
 
