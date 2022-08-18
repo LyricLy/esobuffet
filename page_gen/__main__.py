@@ -34,7 +34,7 @@ def start_round(round_num):
     session = Session()
     round = session.query(Round).get(round_num)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
 
     round.start = now
     round.first_deadline = now + timedelta(days=7)
@@ -42,3 +42,63 @@ def start_round(round_num):
     session.close()
 
     render_first(round_num)
+
+
+def extend_round(round_number, **delta):
+
+    session = Session()
+    round = session.query(Round).get(round_number)
+
+    if round.second_deadline is None:
+        round.first_deadline += timedelta(**delta)
+        choice = True
+    else:
+        round.second_deadline += timedelta(**delta)
+        choice = False
+    session.commit()
+    session.close()
+
+    if choice:
+        render_first(round_number)
+    else:
+        render_second(round_number)
+
+
+
+def add_player(round, name):
+
+    session = Session()
+    others = session.query(Player).filter(Player.round == round).count()
+    new_player = Player(id=others + 1, round=round, name=name)
+    session.add(new_player)
+    session.commit()
+
+    print(f'Created player with id: {new_player.id}')
+    
+    session.close()
+
+
+def add_file(round, player_name, name, language='plaintext'):
+
+    session = Session()
+    player = session.query(Player).filter(Player.round==round)\
+             .filter(Player.name==player_name).one()
+    new_file = File(name=name, round=round, player=player.id, language=language)
+    session.add(new_file)
+    session.commit()
+    session.close()
+
+
+def progress_round(round_num):
+
+    session = Session()
+    round = session.query(Round).get(round_num)
+
+    now = datetime.utcnow()
+
+    round.first_deadline = now
+    round.second_deadline = now + timedelta(days=7)
+    session.commit()
+    session.close()
+
+    render_second(round_num)

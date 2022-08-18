@@ -20,6 +20,7 @@ class File(Base):
     name = Column(String, primary_key=True)
     round = Column(Integer, primary_key=True)
     player = Column(String, primary_key=True)
+    language = Column(String, default='plaintext')
 
 
 class Round(Base):
