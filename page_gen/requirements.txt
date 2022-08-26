@@ -1,0 +1,4 @@
+charset_normalizer
+jinja2
+sqlalchemy
+python-magic
